@@ -32,24 +32,26 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @ContextConfiguration(classes = {TaskController.class})
 @ExtendWith(SpringExtension.class)
 public class TaskControllerTest {
-    @Autowired
-    private TaskController taskController;
-
-    @MockBean
-    private TaskService taskService;
+    @Autowired private TaskController taskController;
+    @MockBean private TaskService taskService;
 
     @Test
     public void testGetTaskById() throws Exception {
+        // given
         Task task = new Task();
-        task.setEmployees(new ArrayList<Employee>());
-        task.setStatus(TaskStatusEnum.NEW);
         task.setId(123L);
-        task.setTitle("Dr");
         task.setCompanyId(123L);
-        task.setDescription("The characteristics of someone or something");
-        LocalDateTime atStartOfDayResult = LocalDate.of(1970, 1, 1).atStartOfDay();
+        task.setTitle("email automation");
+        task.setDescription("automate all the emails from customer");
+        task.setStatus(TaskStatusEnum.NEW);
+        task.setEmployees(new ArrayList<Employee>());
+        LocalDateTime atStartOfDayResult = LocalDate.of(2022, 6, 1).atStartOfDay();
         task.setDeadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()));
+
+        // when
         when(this.taskService.getTaskById(anyLong())).thenReturn(task);
+
+        // then
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/task/{id}", 123L);
         MockMvcBuilders.standaloneSetup(this.taskController)
                 .build()
@@ -58,13 +60,16 @@ public class TaskControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
                         .string(
-                                "{\"id\":123,\"companyId\":123,\"title\":\"Dr\",\"description\":\"The characteristics of someone or something\","
-                                        + "\"deadline\":-14400000,\"status\":\"NEW\"}"));
+                                "{\"id\":123,\"companyId\":123,\"title\":\"email automation\",\"description\":\"automate all the emails from customer\","
+                                        + "\"deadline\":1654027200000,\"status\":\"NEW\"}"));
     }
 
     @Test
     public void testGetAllTasks() throws Exception {
+        // when
         when(this.taskService.getAllTasks()).thenReturn(new ArrayList<Task>());
+
+        // then
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/task");
         MockMvcBuilders.standaloneSetup(this.taskController)
                 .build()
@@ -76,7 +81,10 @@ public class TaskControllerTest {
 
     @Test
     public void testGetAllTasks2() throws Exception {
+        // when
         when(this.taskService.getAllTasks()).thenReturn(new ArrayList<Task>());
+
+        // then
         MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/task");
         getResult.contentType("Not all who wander are lost");
         MockMvcBuilders.standaloneSetup(this.taskController)
@@ -89,7 +97,10 @@ public class TaskControllerTest {
 
     @Test
     public void testGetAllTasksByEmployeeId() throws Exception {
+        // when
         when(this.taskService.getAllTasksByEmployeeId(anyLong())).thenReturn(new ArrayList<Task>());
+
+        // then
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/tasksofEmp/{id}", 123L);
         MockMvcBuilders.standaloneSetup(this.taskController)
                 .build()
@@ -101,7 +112,10 @@ public class TaskControllerTest {
 
     @Test
     public void testGetAllTasksByEmployeeId2() throws Exception {
+        // when
         when(this.taskService.getAllTasksByEmployeeId(anyLong())).thenReturn(new ArrayList<Task>());
+
+        // then
         MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/tasksofEmp/{id}", 123L);
         getResult.contentType("Not all who wander are lost");
         MockMvcBuilders.standaloneSetup(this.taskController)
@@ -114,22 +128,26 @@ public class TaskControllerTest {
 
     @Test
     public void testAddTask() throws Exception {
+        // given
         Task task = new Task();
-        task.setEmployees(new ArrayList<Employee>());
-        task.setStatus(TaskStatusEnum.NEW);
         task.setId(123L);
-        task.setTitle("Dr");
         task.setCompanyId(123L);
-        task.setDescription("The characteristics of someone or something");
-        LocalDateTime atStartOfDayResult = LocalDate.of(1970, 1, 1).atStartOfDay();
+        task.setTitle("parse log");
+        task.setDescription("parse and categorize all the logs into database");
+        task.setStatus(TaskStatusEnum.NEW);
+        task.setEmployees(new ArrayList<Employee>());
+        LocalDateTime atStartOfDayResult = LocalDate.of(2022, 6, 20).atStartOfDay();
         task.setDeadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()));
+
+        // when
         when(this.taskService.addTask(anyLong(), (AddTaskRequestDTO) any())).thenReturn(task);
 
+        // then
         AddTaskRequestDTO addTaskRequestDTO = new AddTaskRequestDTO();
-        addTaskRequestDTO.setEmployees(new ArrayList<Employee>());
-        addTaskRequestDTO.setTitle("Dr");
-        addTaskRequestDTO.setDescription("The characteristics of someone or something");
+        addTaskRequestDTO.setTitle("new title");
+        addTaskRequestDTO.setDescription("new description");
         LocalDateTime atStartOfDayResult1 = LocalDate.of(1970, 1, 1).atStartOfDay();
+        addTaskRequestDTO.setEmployees(new ArrayList<Employee>());
         addTaskRequestDTO.setDeadline(Date.from(atStartOfDayResult1.atZone(ZoneId.systemDefault()).toInstant()));
         String content = (new ObjectMapper()).writeValueAsString(addTaskRequestDTO);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/task/{id}", 123L)
@@ -142,8 +160,8 @@ public class TaskControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
                         .string(
-                                "{\"id\":123,\"companyId\":123,\"title\":\"Dr\",\"description\":\"The characteristics of someone or something\","
-                                        + "\"deadline\":-14400000,\"status\":\"NEW\"}"));
+                                "{\"id\":123,\"companyId\":123,\"title\":\"parse log\",\"description\":\"parse and categorize all the logs into database\","
+                                        + "\"deadline\":1655668800000,\"status\":\"NEW\"}"));
     }
 }
 

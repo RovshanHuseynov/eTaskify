@@ -1,7 +1,8 @@
 # eTaskify
 # ABB eTaskify Project 
-# written by Rovshan Huseynov
-# https://github.com/RovshanHuseynov/eTaskify on 24.05.2022
+# written by Rovshan Huseynov on 24.05.2022
+# https://github.com/RovshanHuseynov/eTaskify
+# -------------------------------------------
 
 # General info
 The project uses h2 in-memory database to be easy to run

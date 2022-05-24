@@ -3,6 +3,8 @@ package az.abbbank.cloud.etaskify.service.impl;
 import az.abbbank.cloud.etaskify.dto.AddTaskRequestDTO;
 import az.abbbank.cloud.etaskify.entity.Employee;
 import az.abbbank.cloud.etaskify.entity.Task;
+import az.abbbank.cloud.etaskify.exception.InvalidEmployeeException;
+import az.abbbank.cloud.etaskify.model.ErrorMessagesEnum;
 import az.abbbank.cloud.etaskify.model.TaskStatusEnum;
 import az.abbbank.cloud.etaskify.repository.TaskRepository;
 import az.abbbank.cloud.etaskify.service.CompanyService;
@@ -19,16 +21,14 @@ import java.util.Optional;
 @Service
 public class TaskServiceImpl implements TaskService {
     @Autowired private TaskRepository taskRepository;
-    @Autowired private ValidationUtil validationUtil;
     @Autowired private CompanyService companyService;
     @Autowired private EmployeeService employeeService;
     @Autowired private EmailUtil emailUtil;
 
     @Override
     public Task getTaskById(long taskId){
-        Optional<Task> task = taskRepository.findById(taskId);
-        validationUtil.validateTask(task);
-        return task.get();
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new InvalidEmployeeException(ErrorMessagesEnum.INVALID_TASK.getMessage(taskId)));
     }
 
     @Override

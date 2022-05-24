@@ -2,33 +2,34 @@ package az.abbbank.cloud.etaskify.service.impl;
 
 import az.abbbank.cloud.etaskify.dto.AddCompanyRequestDTO;
 import az.abbbank.cloud.etaskify.entity.Company;
+import az.abbbank.cloud.etaskify.exception.InvalidCompanyException;
+import az.abbbank.cloud.etaskify.model.ErrorMessagesEnum;
 import az.abbbank.cloud.etaskify.repository.CompanyRepository;
 import az.abbbank.cloud.etaskify.service.CompanyService;
 import az.abbbank.cloud.etaskify.util.GeneratorUtil;
 import az.abbbank.cloud.etaskify.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@Transactional(rollbackFor = { Exception.class })
 public class CompanyServiceImpl implements CompanyService {
     @Autowired private CompanyRepository companyRepository;
     @Autowired private ValidationUtil validationUtil;
 
+    @Override
     public Company getCompanyById(long companyId){
-        Optional<Company> company = companyRepository.findById(companyId);
-        validationUtil.validateCompany(company);
-        return company.get();
+        return companyRepository.findById(companyId)
+                .orElseThrow(() -> new InvalidCompanyException(ErrorMessagesEnum.INVALID_COMPANY.getMessage(companyId)));
     }
 
+    @Override
     public List<Company> getAllCompanies(){
         return companyRepository.findAll();
     }
 
+    @Override
     public Company addCompany(AddCompanyRequestDTO request){
         Company company = Company.builder()
                 .name(request.getName())
@@ -42,6 +43,7 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepository.save(company);
     }
 
+    @Override
     public Company updateCompany(Company company){
         validationUtil.validatePassword(company.getPassword());
         return companyRepository.save(company);

@@ -1,6 +1,7 @@
 package az.abbbank.cloud.etaskify.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
@@ -47,9 +48,7 @@ public class EmployeeServiceImplTest {
     private ValidationUtil validationUtil;
 
     @Test
-    public void testGetEmployeeById() throws InvalidEmployeeException {
-        doNothing().when(this.validationUtil).validateEmployee((Optional<Employee>) any());
-
+    public void testGetEmployeeById() {
         Company company = new Company();
         company.setEmployees(new ArrayList<Employee>());
         company.setEmail("jane.doe@example.org");
@@ -71,39 +70,15 @@ public class EmployeeServiceImplTest {
         Optional<Employee> ofResult = Optional.<Employee>of(employee);
         when(this.employeeRepository.findById((Long) any())).thenReturn(ofResult);
         assertSame(employee, this.employeeServiceImpl.getEmployeeById(123L));
-        verify(this.validationUtil).validateEmployee((Optional<Employee>) any());
         verify(this.employeeRepository).findById((Long) any());
         assertTrue(this.employeeServiceImpl.getAllEmployees().isEmpty());
     }
 
     @Test
-    public void testGetEmployeeById2() throws InvalidEmployeeException {
-        doNothing().when(this.validationUtil).validateEmployee((Optional<Employee>) any());
-
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
-
-        Employee employee = new Employee();
-        employee.setEmail("jane.doe@example.org");
-        employee.setPassword("iloveyou");
-        employee.setId(123L);
-        employee.setName("Name");
-        employee.setCompany(company);
-        employee.setSurname("Doe");
-        employee.setTasks(new ArrayList<Task>());
-        Optional<Employee> ofResult = Optional.<Employee>of(employee);
-        when(this.employeeRepository.findById((Long) any())).thenReturn(ofResult);
-        assertSame(employee, this.employeeServiceImpl.getEmployeeById(0L));
-        verify(this.validationUtil).validateEmployee((Optional<Employee>) any());
+    public void testGetEmployeeById2() {
+        when(this.employeeRepository.findById((Long) any())).thenReturn(Optional.<Employee>empty());
+        assertThrows(InvalidEmployeeException.class, () -> this.employeeServiceImpl.getEmployeeById(123L));
         verify(this.employeeRepository).findById((Long) any());
-        assertTrue(this.employeeServiceImpl.getAllEmployees().isEmpty());
     }
 
     @Test
@@ -156,9 +131,8 @@ public class EmployeeServiceImplTest {
     }
 
     @Test
-    public void testUpdateEmployee() throws InvalidEmployeeException, InvalidPasswordException {
+    public void testUpdateEmployee() throws InvalidPasswordException {
         doNothing().when(this.validationUtil).validatePassword(anyString());
-        doNothing().when(this.validationUtil).validateEmployee((Optional<Employee>) any());
 
         Company company = new Company();
         company.setEmployees(new ArrayList<Employee>());
@@ -202,11 +176,39 @@ public class EmployeeServiceImplTest {
         when(this.employeeRepository.findById((Long) any())).thenReturn(ofResult);
         assertSame(employee1, this.employeeServiceImpl
                 .updateEmployee(new UpdateEmployeeRequestDTO(123L, "Name", "Doe", "jane.doe@example.org", "iloveyou")));
-        verify(this.validationUtil).validateEmployee((Optional<Employee>) any());
         verify(this.validationUtil).validatePassword(anyString());
         verify(this.employeeRepository).findById((Long) any());
         verify(this.employeeRepository).save((Employee) any());
         assertTrue(this.employeeServiceImpl.getAllEmployees().isEmpty());
+    }
+
+    @Test
+    public void testUpdateEmployee2() throws InvalidPasswordException {
+        doNothing().when(this.validationUtil).validatePassword(anyString());
+
+        Company company = new Company();
+        company.setEmployees(new ArrayList<Employee>());
+        company.setEmail("jane.doe@example.org");
+        company.setPassword("iloveyou");
+        company.setUsername("janedoe");
+        company.setId(123L);
+        company.setName("Name");
+        company.setPhoneNumber("4105551212");
+        company.setAddress("42 Main St");
+
+        Employee employee = new Employee();
+        employee.setEmail("jane.doe@example.org");
+        employee.setPassword("iloveyou");
+        employee.setId(123L);
+        employee.setName("Name");
+        employee.setCompany(company);
+        employee.setSurname("Doe");
+        employee.setTasks(new ArrayList<Task>());
+        when(this.employeeRepository.save((Employee) any())).thenReturn(employee);
+        when(this.employeeRepository.findById((Long) any())).thenReturn(Optional.<Employee>empty());
+        assertThrows(InvalidEmployeeException.class, () -> this.employeeServiceImpl
+                .updateEmployee(new UpdateEmployeeRequestDTO(123L, "Name", "Doe", "jane.doe@example.org", "iloveyou")));
+        verify(this.employeeRepository).findById((Long) any());
     }
 }
 

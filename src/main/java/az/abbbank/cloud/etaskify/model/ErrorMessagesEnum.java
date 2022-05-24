@@ -13,4 +13,16 @@ public enum ErrorMessagesEnum {
     INVALID_TASK_STATUS_ENUM("Task status enum not found");
 
     private final String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getMessage(long id) {
+        return getMessage(String.valueOf(id));
+    }
+
+    public String getMessage(String text) {
+        return String.join(" ", text, message);
+    }
 }

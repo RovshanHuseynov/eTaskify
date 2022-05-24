@@ -1,6 +1,7 @@
 package az.abbbank.cloud.etaskify.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
@@ -30,19 +31,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {CompanyServiceImpl.class})
 @ExtendWith(SpringExtension.class)
 public class CompanyServiceImplTest {
-    @MockBean
-    private CompanyRepository companyRepository;
-
-    @Autowired
-    private CompanyServiceImpl companyServiceImpl;
-
-    @MockBean
-    private ValidationUtil validationUtil;
+    @MockBean private CompanyRepository companyRepository;
+    @Autowired private CompanyServiceImpl companyServiceImpl;
+    @MockBean private ValidationUtil validationUtil;
 
     @Test
-    public void testGetCompanyById() throws InvalidCompanyException {
-        doNothing().when(this.validationUtil).validateCompany((Optional<Company>) any());
-
+    public void testGetCompanyById() {
         Company company = new Company();
         company.setEmployees(new ArrayList<Employee>());
         company.setEmail("jane.doe@example.org");
@@ -55,30 +49,15 @@ public class CompanyServiceImplTest {
         Optional<Company> ofResult = Optional.<Company>of(company);
         when(this.companyRepository.findById((Long) any())).thenReturn(ofResult);
         assertSame(company, this.companyServiceImpl.getCompanyById(123L));
-        verify(this.validationUtil).validateCompany((Optional<Company>) any());
         verify(this.companyRepository).findById((Long) any());
         assertTrue(this.companyServiceImpl.getAllCompanies().isEmpty());
     }
 
     @Test
-    public void testGetCompanyById2() throws InvalidCompanyException {
-        doNothing().when(this.validationUtil).validateCompany((Optional<Company>) any());
-
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
-        Optional<Company> ofResult = Optional.<Company>of(company);
-        when(this.companyRepository.findById((Long) any())).thenReturn(ofResult);
-        assertSame(company, this.companyServiceImpl.getCompanyById(0L));
-        verify(this.validationUtil).validateCompany((Optional<Company>) any());
+    public void testGetCompanyById2() {
+        when(this.companyRepository.findById((Long) any())).thenReturn(Optional.<Company>empty());
+        assertThrows(InvalidCompanyException.class, () -> this.companyServiceImpl.getCompanyById(123L));
         verify(this.companyRepository).findById((Long) any());
-        assertTrue(this.companyServiceImpl.getAllCompanies().isEmpty());
     }
 
     @Test

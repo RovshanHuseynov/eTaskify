@@ -4,6 +4,8 @@ import az.abbbank.cloud.etaskify.dto.AddEmployeeRequestDTO;
 import az.abbbank.cloud.etaskify.dto.UpdateEmployeeRequestDTO;
 import az.abbbank.cloud.etaskify.entity.Company;
 import az.abbbank.cloud.etaskify.entity.Employee;
+import az.abbbank.cloud.etaskify.exception.InvalidEmployeeException;
+import az.abbbank.cloud.etaskify.model.ErrorMessagesEnum;
 import az.abbbank.cloud.etaskify.repository.EmployeeRepository;
 import az.abbbank.cloud.etaskify.service.CompanyService;
 import az.abbbank.cloud.etaskify.service.EmployeeService;
@@ -22,16 +24,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired private ValidationUtil validationUtil;
     @Autowired private CompanyService companyService;
 
+    @Override
     public Employee getEmployeeById(long employeeId){
-        Optional<Employee> employee =  employeeRepository.findById(employeeId);
-        validationUtil.validateEmployee(employee);
-        return employee.get();
+        return employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new InvalidEmployeeException(ErrorMessagesEnum.INVALID_EMPLOYEE.getMessage(employeeId)));
     }
 
+    @Override
     public List<Employee> getAllEmployees(){
         return employeeRepository.findAll();
     }
 
+    @Override
     public Employee addEmployee(long companyId, AddEmployeeRequestDTO request){
         Company company = companyService.getCompanyById(companyId);
 
@@ -48,6 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.save(employee);
     }
 
+    @Override
     public Employee updateEmployee(UpdateEmployeeRequestDTO request){
         Employee employee = getEmployeeById(request.getId());
         validationUtil.validatePassword(employee.getPassword());

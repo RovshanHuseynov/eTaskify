@@ -1,6 +1,7 @@
 package az.abbbank.cloud.etaskify.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
@@ -12,13 +13,12 @@ import az.abbbank.cloud.etaskify.dto.AddTaskRequestDTO;
 import az.abbbank.cloud.etaskify.entity.Company;
 import az.abbbank.cloud.etaskify.entity.Employee;
 import az.abbbank.cloud.etaskify.entity.Task;
-import az.abbbank.cloud.etaskify.exception.InvalidTaskException;
+import az.abbbank.cloud.etaskify.exception.InvalidEmployeeException;
 import az.abbbank.cloud.etaskify.model.TaskStatusEnum;
 import az.abbbank.cloud.etaskify.repository.TaskRepository;
 import az.abbbank.cloud.etaskify.service.CompanyService;
 import az.abbbank.cloud.etaskify.service.EmployeeService;
 import az.abbbank.cloud.etaskify.util.EmailUtil;
-import az.abbbank.cloud.etaskify.util.ValidationUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,28 +38,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(classes = {EmailUtil.class, TaskServiceImpl.class})
 @ExtendWith(SpringExtension.class)
 public class TaskServiceImplTest {
-    @MockBean
-    private CompanyService companyService;
-
-    @MockBean
-    private EmailUtil emailUtil;
-
-    @MockBean
-    private EmployeeService employeeService;
-
-    @MockBean
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private TaskServiceImpl taskServiceImpl;
-
-    @MockBean
-    private ValidationUtil validationUtil;
+    @MockBean private CompanyService companyService;
+    @MockBean private EmailUtil emailUtil;
+    @MockBean private EmployeeService employeeService;
+    @MockBean private TaskRepository taskRepository;
+    @Autowired private TaskServiceImpl taskServiceImpl;
 
     @Test
-    public void testGetTaskById() throws InvalidTaskException {
-        doNothing().when(this.validationUtil).validateTask((Optional<Task>) any());
-
+    public void testGetTaskById() {
         Task task = new Task();
         task.setEmployees(new ArrayList<Employee>());
         task.setStatus(TaskStatusEnum.NEW);
@@ -72,30 +58,15 @@ public class TaskServiceImplTest {
         Optional<Task> ofResult = Optional.<Task>of(task);
         when(this.taskRepository.findById((Long) any())).thenReturn(ofResult);
         assertSame(task, this.taskServiceImpl.getTaskById(123L));
-        verify(this.validationUtil).validateTask((Optional<Task>) any());
         verify(this.taskRepository).findById((Long) any());
         assertTrue(this.taskServiceImpl.getAllTasks().isEmpty());
     }
 
     @Test
-    public void testGetTaskById2() throws InvalidTaskException {
-        doNothing().when(this.validationUtil).validateTask((Optional<Task>) any());
-
-        Task task = new Task();
-        task.setEmployees(new ArrayList<Employee>());
-        task.setStatus(TaskStatusEnum.NEW);
-        task.setId(123L);
-        task.setTitle("Dr");
-        task.setCompanyId(123L);
-        task.setDescription("The characteristics of someone or something");
-        LocalDateTime atStartOfDayResult = LocalDate.of(1970, 1, 1).atStartOfDay();
-        task.setDeadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()));
-        Optional<Task> ofResult = Optional.<Task>of(task);
-        when(this.taskRepository.findById((Long) any())).thenReturn(ofResult);
-        assertSame(task, this.taskServiceImpl.getTaskById(0L));
-        verify(this.validationUtil).validateTask((Optional<Task>) any());
+    public void testGetTaskById2() {
+        when(this.taskRepository.findById((Long) any())).thenReturn(Optional.<Task>empty());
+        assertThrows(InvalidEmployeeException.class, () -> this.taskServiceImpl.getTaskById(123L));
         verify(this.taskRepository).findById((Long) any());
-        assertTrue(this.taskServiceImpl.getAllTasks().isEmpty());
     }
 
     @Test
