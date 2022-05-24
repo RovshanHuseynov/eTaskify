@@ -42,6 +42,4 @@ public class Employee {
     @JoinTable(name = "employee_task", joinColumns = { @JoinColumn(name = "employee_id") },
     inverseJoinColumns = { @JoinColumn(name = "task_id") })
     private List<Task> tasks;
-
-    // TODO add readme file
 }
