@@ -4,7 +4,7 @@
 # https://github.com/RovshanHuseynov/eTaskify on 24.05.2022
 
 # General info
-The project uses h2-inMemory-database to be easy to run
+The project uses h2 in-memory database to be easy to run
 server.port=8099 (http://localhost:8099)
 h2 database url: http://localhost:8099/h2-console
 h2 database username=sa

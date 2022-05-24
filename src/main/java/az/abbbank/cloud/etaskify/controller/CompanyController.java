@@ -12,11 +12,6 @@ import java.util.List;
 public class CompanyController {
     @Autowired private CompanyService companyService;
 
-    // TODO for MockMvc
-    public CompanyController(CompanyService companyService) {
-        this.companyService = companyService;
-    }
-
     @GetMapping("/company/{id}")
     public Company getCompanyById(@PathVariable("id") long companyId){
         return companyService.getCompanyById(companyId);

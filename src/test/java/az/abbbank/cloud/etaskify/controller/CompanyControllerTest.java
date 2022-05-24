@@ -1,63 +1,162 @@
 package az.abbbank.cloud.etaskify.controller;
 
-import az.abbbank.cloud.etaskify.entity.Company;
-import az.abbbank.cloud.etaskify.service.CompanyService;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.when;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import az.abbbank.cloud.etaskify.dto.AddCompanyRequestDTO;
+import az.abbbank.cloud.etaskify.entity.Company;
+import az.abbbank.cloud.etaskify.entity.Employee;
+import az.abbbank.cloud.etaskify.service.CompanyService;
+import az.abbbank.cloud.etaskify.service.impl.CompanyServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+@ContextConfiguration(classes = {CompanyController.class})
 @ExtendWith(SpringExtension.class)
-class CompanyControllerTest {
+public class CompanyControllerTest {
+    @Autowired
+    private CompanyController companyController;
 
-    private static MockMvc mockMvc;
-    private static CompanyService companyService = mock(CompanyService.class);
+    @MockBean
+    private CompanyService companyService;
 
-    @BeforeAll
-    static void init(){
-        mockMvc = MockMvcBuilders.standaloneSetup(new CompanyController(companyService)).build();
+    @Test
+    public void testGetCompanyById() throws Exception {
+        // given
+        Company company = new Company();
+        company.setEmployees(new ArrayList<Employee>());
+        company.setEmail("jane.doe@example.org");
+        company.setPassword("iloveyou");
+        company.setUsername("janedoe");
+        company.setId(123L);
+        company.setName("Name");
+        company.setPhoneNumber("4105551212");
+        company.setAddress("42 Main St");
+
+        // when
+        when(this.companyService.getCompanyById(anyLong())).thenReturn(company);
+
+        // then
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/company/{id}", 123L);
+        MockMvcBuilders.standaloneSetup(this.companyController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string(
+                                "{\"id\":123,\"name\":\"Name\",\"phoneNumber\":\"4105551212\",\"address\":\"42 Main St\",\"email\":\"jane.doe@example"
+                                        + ".org\",\"username\":\"janedoe\",\"password\":\"iloveyou\",\"employees\":[]}"));
     }
 
     @Test
-    void getCompanyById() throws Exception {
-        Company company = Company.builder()
-                .name("company")
-                .build();
-        when(companyService.getCompanyById(1))
-                .thenReturn(company);
-        mockMvc.perform(get("/company/1"))
-                .andDo(print())
-                .andExpect(status().isOk());
+    public void testGetAllCompanies() throws Exception {
+        when(this.companyService.getAllCompanies()).thenReturn(new ArrayList<Company>());
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/company");
+        MockMvcBuilders.standaloneSetup(this.companyController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content().string("[]"));
     }
 
     @Test
-    @Disabled
-    void getAllCompanies() {
+    public void testGetAllCompanies2() throws Exception {
+        when(this.companyService.getAllCompanies()).thenReturn(new ArrayList<Company>());
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/company");
+        getResult.contentType("Not all who wander are lost");
+        MockMvcBuilders.standaloneSetup(this.companyController)
+                .build()
+                .perform(getResult)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content().string("[]"));
     }
 
     @Test
-    @Disabled
-    void addCompany() {
+    public void testAddCompany() throws Exception {
+        Company company = new Company();
+        company.setEmployees(new ArrayList<Employee>());
+        company.setEmail("jane.doe@example.org");
+        company.setPassword("iloveyou");
+        company.setUsername("janedoe");
+        company.setId(123L);
+        company.setName("Name");
+        company.setPhoneNumber("4105551212");
+        company.setAddress("42 Main St");
+        when(this.companyService.addCompany((AddCompanyRequestDTO) any())).thenReturn(company);
+
+        AddCompanyRequestDTO addCompanyRequestDTO = new AddCompanyRequestDTO();
+        addCompanyRequestDTO.setEmployees(new ArrayList<Employee>());
+        addCompanyRequestDTO.setEmail("jane.doe@example.org");
+        addCompanyRequestDTO.setName("Name");
+        addCompanyRequestDTO.setPhoneNumber("4105551212");
+        addCompanyRequestDTO.setAddress("42 Main St");
+        String content = (new ObjectMapper()).writeValueAsString(addCompanyRequestDTO);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/company")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+        MockMvcBuilders.standaloneSetup(this.companyController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string(
+                                "{\"id\":123,\"name\":\"Name\",\"phoneNumber\":\"4105551212\",\"address\":\"42 Main St\",\"email\":\"jane.doe@example"
+                                        + ".org\",\"username\":\"janedoe\",\"password\":\"iloveyou\",\"employees\":[]}"));
     }
 
     @Test
-    @Disabled
-    void updateCompany() {
+    public void testUpdateCompany() throws Exception {
+        Company company = new Company();
+        company.setEmployees(new ArrayList<Employee>());
+        company.setEmail("jane.doe@example.org");
+        company.setPassword("iloveyou");
+        company.setUsername("janedoe");
+        company.setId(123L);
+        company.setName("Name");
+        company.setPhoneNumber("4105551212");
+        company.setAddress("42 Main St");
+        when(this.companyService.updateCompany((Company) any())).thenReturn(company);
+
+        Company company1 = new Company();
+        company1.setEmployees(new ArrayList<Employee>());
+        company1.setEmail("jane.doe@example.org");
+        company1.setPassword("iloveyou");
+        company1.setUsername("janedoe");
+        company1.setId(123L);
+        company1.setName("Name");
+        company1.setPhoneNumber("4105551212");
+        company1.setAddress("42 Main St");
+        String content = (new ObjectMapper()).writeValueAsString(company1);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/company")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+        MockMvcBuilders.standaloneSetup(this.companyController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string(
+                                "{\"id\":123,\"name\":\"Name\",\"phoneNumber\":\"4105551212\",\"address\":\"42 Main St\",\"email\":\"jane.doe@example"
+                                        + ".org\",\"username\":\"janedoe\",\"password\":\"iloveyou\",\"employees\":[]}"));
     }
 }
+
