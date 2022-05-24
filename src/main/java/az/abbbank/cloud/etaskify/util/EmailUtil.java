@@ -6,21 +6,22 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
 @Component
 public class EmailUtil {
-    public JavaMailSender javaMailSender;
-    public String from = "noreply@gmail.com";
+    private JavaMailSender javaMailSender;
+    private final String FROM = "noreply@abb-bank.az";
 
     public void notifyEmployeesByEmail(long taskId, List<Employee> employees){
         SimpleMailMessage msg;
+        msg = new SimpleMailMessage();
+        msg.setFrom(FROM);
         for(Employee employee : employees){
-            msg = new SimpleMailMessage();
-            msg.setTo(from, employee.getEmail());
-
-            msg.setSubject("New Task Assigned");
-            msg.setText("You have a new task which id: " + taskId);
-
-            javaMailSender.send(msg);
+            msg.setTo(employee.getEmail());
         }
+        msg.setSubject("New Task #" + taskId);
+        msg.setText("Task #" + taskId + " Has Been Assigned To You");
+
+        javaMailSender.send(msg);
     }
 }
