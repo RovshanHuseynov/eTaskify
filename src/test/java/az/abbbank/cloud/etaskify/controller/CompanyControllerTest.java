@@ -33,15 +33,16 @@ public class CompanyControllerTest {
     @Test
     public void testGetCompanyById() throws Exception {
         // given
-        Company company = new Company();
-        company.setId(123L);
-        company.setName("ABB");
-        company.setEmail("system@abb-bank.az");
-        company.setPassword("abb123");
-        company.setUsername("adminabb");
-        company.setPhoneNumber("937");
-        company.setAddress("Nizami street");
-        company.setEmployees(new ArrayList<Employee>());
+        Company company = Company.builder()
+                .id(123L)
+                .name("ABB")
+                .email("system@abb-bank.az")
+                .password("abb123")
+                .username("adminabb")
+                .phoneNumber("937")
+                .address("Nizami street")
+                .employees(new ArrayList<Employee>())
+                .build();
 
         // when
         when(this.companyService.getCompanyById(anyLong())).thenReturn(company);
@@ -93,15 +94,16 @@ public class CompanyControllerTest {
     @Test
     public void testAddCompany() throws Exception {
         // given
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setId(123L);
-        company.setName("cybernet");
-        company.setEmail("system@cybernet.az");
-        company.setPassword("cybernet123");
-        company.setUsername("admincybernet");
-        company.setPhoneNumber("0704005567");
-        company.setAddress("xetai street");
+        Company company = Company.builder()
+                .employees(new ArrayList<Employee>())
+                .id(123L)
+                .name("cybernet")
+                .email("system@cybernet.az")
+                .password("cybernet123")
+                .username("admincybernet")
+                .phoneNumber("0704005567")
+                .address("xetai street")
+                .build();
 
         // when
         when(this.companyService.addCompany((AddCompanyRequestDTO) any())).thenReturn(company);

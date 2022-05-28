@@ -1,22 +1,11 @@
 package az.abbbank.cloud.etaskify.controller;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.when;
-
 import az.abbbank.cloud.etaskify.dto.AddTaskRequestDTO;
 import az.abbbank.cloud.etaskify.entity.Employee;
 import az.abbbank.cloud.etaskify.entity.Task;
 import az.abbbank.cloud.etaskify.model.TaskStatusEnum;
 import az.abbbank.cloud.etaskify.service.TaskService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +18,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+
+import static org.mockito.Mockito.*;
+
 @ContextConfiguration(classes = {TaskController.class})
 @ExtendWith(SpringExtension.class)
 public class TaskControllerTest {
@@ -38,15 +35,16 @@ public class TaskControllerTest {
     @Test
     public void testGetTaskById() throws Exception {
         // given
-        Task task = new Task();
-        task.setId(123L);
-        task.setCompanyId(123L);
-        task.setTitle("email automation");
-        task.setDescription("automate all the emails from customer");
-        task.setStatus(TaskStatusEnum.NEW);
-        task.setEmployees(new ArrayList<Employee>());
         LocalDateTime atStartOfDayResult = LocalDate.of(2022, 6, 1).atStartOfDay();
-        task.setDeadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()));
+        Task task = Task.builder()
+                .id(123L)
+                .companyId(123L)
+                .title("email automation")
+                .description("automate all the emails from customer")
+                .status(TaskStatusEnum.NEW)
+                .employees(new ArrayList<Employee>())
+                .deadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()))
+                .build();
 
         // when
         when(this.taskService.getTaskById(anyLong())).thenReturn(task);
@@ -129,15 +127,16 @@ public class TaskControllerTest {
     @Test
     public void testAddTask() throws Exception {
         // given
-        Task task = new Task();
-        task.setId(123L);
-        task.setCompanyId(123L);
-        task.setTitle("parse log");
-        task.setDescription("parse and categorize all the logs into database");
-        task.setStatus(TaskStatusEnum.NEW);
-        task.setEmployees(new ArrayList<Employee>());
         LocalDateTime atStartOfDayResult = LocalDate.of(2022, 6, 20).atStartOfDay();
-        task.setDeadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()));
+        Task task = Task.builder()
+                .id(123L)
+                .companyId(123L)
+                .title("parse log")
+                .description("parse and categorize all the logs into database")
+                .status(TaskStatusEnum.NEW)
+                .employees(new ArrayList<Employee>())
+                .deadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()))
+                .build();
 
         // when
         when(this.taskService.addTask(anyLong(), (AddTaskRequestDTO) any())).thenReturn(task);

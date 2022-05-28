@@ -37,17 +37,23 @@ public class CompanyServiceImplTest {
 
     @Test
     public void testGetCompanyById() {
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
+        //given
+        Company company = Company.builder()
+                .employees(new ArrayList<Employee>())
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .id(123L)
+                .name("Name")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .build();
+
+        // when
         Optional<Company> ofResult = Optional.<Company>of(company);
         when(this.companyRepository.findById((Long) any())).thenReturn(ofResult);
+
+        // then
         assertSame(company, this.companyServiceImpl.getCompanyById(123L));
         verify(this.companyRepository).findById((Long) any());
         assertTrue(this.companyServiceImpl.getAllCompanies().isEmpty());

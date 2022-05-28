@@ -35,24 +35,26 @@ public class EmployeeControllerTest {
     @Test
     public void testGetEmployeeById() throws Exception {
         // given
-        Company company = new Company();
-        company.setId(123L);
-        company.setName("cybernet");
-        company.setEmail("system@cybernet.az");
-        company.setPassword("cybernet123");
-        company.setUsername("admincybernet");
-        company.setPhoneNumber("01245632423");
-        company.setAddress("xetai street");
-        company.setEmployees(new ArrayList<Employee>());
+        Company company = Company.builder()
+                .id(123L)
+                .name("cybernet")
+                .email("system@cybernet.az")
+                .password("cybernet123")
+                .username("admincybernet")
+                .phoneNumber("01245632423")
+                .address("xetai street")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee = new Employee();
-        employee.setId(123L);
-        employee.setName("rovshan");
-        employee.setSurname("huseynov");
-        employee.setEmail("rovshan.huseynov@cybernet.az");
-        employee.setPassword("rovshan123");
-        employee.setTasks(new ArrayList<Task>());
-        employee.setCompany(company);
+        Employee employee = Employee.builder()
+                .id(123L)
+                .name("rovshan")
+                .surname("huseynov")
+                .email("rovshan.huseynov@cybernet.az")
+                .password("rovshan123")
+                .tasks(new ArrayList<Task>())
+                .company(company)
+                .build();
 
         // when
         when(this.employeeService.getEmployeeById(anyLong())).thenReturn(employee);
@@ -104,24 +106,26 @@ public class EmployeeControllerTest {
     @Test
     public void testAddEmployee() throws Exception {
         // given
-        Company company = new Company();
-        company.setId(123L);
-        company.setName("abb");
-        company.setEmail("system@abb-bank.az");
-        company.setPassword("abb123");
-        company.setUsername("adminabb");
-        company.setPhoneNumber("937");
-        company.setAddress("nizami street");
-        company.setEmployees(new ArrayList<Employee>());
+        Company company = Company.builder()
+                .id(123L)
+                .name("abb")
+                .email("system@abb-bank.az")
+                .password("abb123")
+                .username("adminabb")
+                .phoneNumber("937")
+                .address("nizami street")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee = new Employee();
-        employee.setId(123L);
-        employee.setName("ali");
-        employee.setSurname("alili");
-        employee.setEmail("ali.alili@abb-bank.az");
-        employee.setPassword("ali123");
-        employee.setTasks(new ArrayList<Task>());
-        employee.setCompany(company);
+        Employee employee = Employee.builder()
+                .id(123L)
+                .name("ali")
+                .surname("alili")
+                .email("ali.alili@abb-bank.az")
+                .password("ali123")
+                .tasks(new ArrayList<Task>())
+                .company(company)
+                .build();
 
         // when
         when(this.employeeService.addEmployee(anyLong(), (AddEmployeeRequestDTO) any())).thenReturn(employee);
@@ -149,24 +153,26 @@ public class EmployeeControllerTest {
     @Test
     public void testUpdateEmployee() throws Exception {
         // given
-        Company company = new Company();
-        company.setId(123L);
-        company.setName("azericard");
-        company.setEmail("system@azericard.com");
-        company.setPassword("azericard123");
-        company.setUsername("adminazericard");
-        company.setPhoneNumber("012435352342");
-        company.setAddress("bulbul street");
-        company.setEmployees(new ArrayList<Employee>());
+        Company company = Company.builder()
+                .id(123L)
+                .name("azericard")
+                .email("system@azericard.com")
+                .password("azericard123")
+                .username("adminazericard")
+                .phoneNumber("012435352342")
+                .address("bulbul street")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee = new Employee();
-        employee.setId(123L);
-        employee.setName("semed");
-        employee.setSurname("semedov");
-        employee.setEmail("semed.semedov@azericard.com");
-        employee.setPassword("semed123");
-        employee.setTasks(new ArrayList<Task>());
-        employee.setCompany(company);
+        Employee employee = Employee.builder()
+                .id(123L)
+                .name("semed")
+                .surname("semedov")
+                .email("semed.semedov@azericard.com")
+                .password("semed123")
+                .tasks(new ArrayList<Task>())
+                .company(company)
+                .build();
 
         // when
         when(this.employeeService.updateEmployee((UpdateEmployeeRequestDTO) any())).thenReturn(employee);
