@@ -49,26 +49,33 @@ public class EmployeeServiceImplTest {
 
     @Test
     public void testGetEmployeeById() {
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
+        // given
+        Company company = Company.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee = new Employee();
-        employee.setEmail("jane.doe@example.org");
-        employee.setPassword("iloveyou");
-        employee.setId(123L);
-        employee.setName("Name");
-        employee.setCompany(company);
-        employee.setSurname("Doe");
-        employee.setTasks(new ArrayList<Task>());
+        Employee employee = Employee.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .company(company)
+                .surname("Doe")
+                .tasks(new ArrayList<Task>())
+                .build();
         Optional<Employee> ofResult = Optional.<Employee>of(employee);
+
+        // when
         when(this.employeeRepository.findById((Long) any())).thenReturn(ofResult);
+
+        // then
         assertSame(employee, this.employeeServiceImpl.getEmployeeById(123L));
         verify(this.employeeRepository).findById((Long) any());
         assertTrue(this.employeeServiceImpl.getAllEmployees().isEmpty());
@@ -76,16 +83,24 @@ public class EmployeeServiceImplTest {
 
     @Test
     public void testGetEmployeeById2() {
+        // when
         when(this.employeeRepository.findById((Long) any())).thenReturn(Optional.<Employee>empty());
+
+        // then
         assertThrows(InvalidEmployeeException.class, () -> this.employeeServiceImpl.getEmployeeById(123L));
         verify(this.employeeRepository).findById((Long) any());
     }
 
     @Test
     public void testGetAllEmployees() {
+        // given
         ArrayList<Employee> employeeList = new ArrayList<Employee>();
+
+        // when
         when(this.employeeRepository.findAll()).thenReturn(employeeList);
         List<Employee> actualAllEmployees = this.employeeServiceImpl.getAllEmployees();
+
+        // then
         assertSame(employeeList, actualAllEmployees);
         assertTrue(actualAllEmployees.isEmpty());
         verify(this.employeeRepository).findAll();
@@ -93,36 +108,45 @@ public class EmployeeServiceImplTest {
 
     @Test
     public void testAddEmployee() {
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
+        // given
+        Company company = Company.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee = new Employee();
-        employee.setEmail("jane.doe@example.org");
-        employee.setPassword("iloveyou");
-        employee.setId(123L);
-        employee.setName("Name");
-        employee.setCompany(company);
-        employee.setSurname("Doe");
-        employee.setTasks(new ArrayList<Task>());
+        Employee employee = Employee.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .company(company)
+                .surname("Doe")
+                .tasks(new ArrayList<Task>())
+                .build();
+
+        // when
         when(this.employeeRepository.save((Employee) any())).thenReturn(employee);
 
-        Company company1 = new Company();
-        company1.setEmployees(new ArrayList<Employee>());
-        company1.setEmail("jane.doe@example.org");
-        company1.setPassword("iloveyou");
-        company1.setUsername("janedoe");
-        company1.setId(123L);
-        company1.setName("Name");
-        company1.setPhoneNumber("4105551212");
-        company1.setAddress("42 Main St");
+        Company company1 = Company.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .employees(new ArrayList<Employee>())
+                .build();
+
         when(this.companyService.getCompanyById(anyLong())).thenReturn(company1);
+
+        // then
         assertSame(employee,
                 this.employeeServiceImpl.addEmployee(123L, new AddEmployeeRequestDTO("Name", "Doe", "jane.doe@example.org")));
         verify(this.employeeRepository).save((Employee) any());
@@ -132,48 +156,58 @@ public class EmployeeServiceImplTest {
 
     @Test
     public void testUpdateEmployee() throws InvalidPasswordException {
+        // given
         doNothing().when(this.validationUtil).validatePassword(anyString());
 
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
+        Company company = Company.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee = new Employee();
-        employee.setEmail("jane.doe@example.org");
-        employee.setPassword("iloveyou");
-        employee.setId(123L);
-        employee.setName("Name");
-        employee.setCompany(company);
-        employee.setSurname("Doe");
-        employee.setTasks(new ArrayList<Task>());
+        Employee employee = Employee.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .company(company)
+                .surname("Doe")
+                .tasks(new ArrayList<Task>())
+                .build();
+
         Optional<Employee> ofResult = Optional.<Employee>of(employee);
 
-        Company company1 = new Company();
-        company1.setEmployees(new ArrayList<Employee>());
-        company1.setEmail("jane.doe@example.org");
-        company1.setPassword("iloveyou");
-        company1.setUsername("janedoe");
-        company1.setId(123L);
-        company1.setName("Name");
-        company1.setPhoneNumber("4105551212");
-        company1.setAddress("42 Main St");
+        Company company1 = Company.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee1 = new Employee();
-        employee1.setEmail("jane.doe@example.org");
-        employee1.setPassword("iloveyou");
-        employee1.setId(123L);
-        employee1.setName("Name");
-        employee1.setCompany(company1);
-        employee1.setSurname("Doe");
-        employee1.setTasks(new ArrayList<Task>());
+        Employee employee1 = Employee.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .company(company1)
+                .surname("Doe")
+                .tasks(new ArrayList<Task>())
+                .build();
+
+        // when
         when(this.employeeRepository.save((Employee) any())).thenReturn(employee1);
         when(this.employeeRepository.findById((Long) any())).thenReturn(ofResult);
+
+        // then
         assertSame(employee1, this.employeeServiceImpl
                 .updateEmployee(new UpdateEmployeeRequestDTO(123L, "Name", "Doe", "jane.doe@example.org", "iloveyou")));
         verify(this.validationUtil).validatePassword(anyString());
@@ -184,28 +218,35 @@ public class EmployeeServiceImplTest {
 
     @Test
     public void testUpdateEmployee2() throws InvalidPasswordException {
+        // given
         doNothing().when(this.validationUtil).validatePassword(anyString());
 
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
+        Company company = Company.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee = new Employee();
-        employee.setEmail("jane.doe@example.org");
-        employee.setPassword("iloveyou");
-        employee.setId(123L);
-        employee.setName("Name");
-        employee.setCompany(company);
-        employee.setSurname("Doe");
-        employee.setTasks(new ArrayList<Task>());
+        Employee employee = Employee.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .company(company)
+                .surname("Doe")
+                .tasks(new ArrayList<Task>())
+                .build();
+
+        // when
         when(this.employeeRepository.save((Employee) any())).thenReturn(employee);
         when(this.employeeRepository.findById((Long) any())).thenReturn(Optional.<Employee>empty());
+
+        // then
         assertThrows(InvalidEmployeeException.class, () -> this.employeeServiceImpl
                 .updateEmployee(new UpdateEmployeeRequestDTO(123L, "Name", "Doe", "jane.doe@example.org", "iloveyou")));
         verify(this.employeeRepository).findById((Long) any());

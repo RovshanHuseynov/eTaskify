@@ -46,17 +46,24 @@ public class TaskServiceImplTest {
 
     @Test
     public void testGetTaskById() {
-        Task task = new Task();
-        task.setEmployees(new ArrayList<Employee>());
-        task.setStatus(TaskStatusEnum.NEW);
-        task.setId(123L);
-        task.setTitle("Dr");
-        task.setCompanyId(123L);
-        task.setDescription("The characteristics of someone or something");
+        // given
         LocalDateTime atStartOfDayResult = LocalDate.of(1970, 1, 1).atStartOfDay();
-        task.setDeadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()));
+        Task task = Task.builder()
+                .id(123L)
+                .title("Dr")
+                .status(TaskStatusEnum.NEW)
+                .companyId(123L)
+                .description("The characteristics of someone or something")
+                .deadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()))
+                .employees(new ArrayList<Employee>())
+                .build();
+
         Optional<Task> ofResult = Optional.<Task>of(task);
+
+        // when
         when(this.taskRepository.findById((Long) any())).thenReturn(ofResult);
+
+        // then
         assertSame(task, this.taskServiceImpl.getTaskById(123L));
         verify(this.taskRepository).findById((Long) any());
         assertTrue(this.taskServiceImpl.getAllTasks().isEmpty());
@@ -64,16 +71,24 @@ public class TaskServiceImplTest {
 
     @Test
     public void testGetTaskById2() {
+        // when
         when(this.taskRepository.findById((Long) any())).thenReturn(Optional.<Task>empty());
+
+        // then
         assertThrows(InvalidEmployeeException.class, () -> this.taskServiceImpl.getTaskById(123L));
         verify(this.taskRepository).findById((Long) any());
     }
 
     @Test
     public void testGetAllTasks() {
+        // given
         ArrayList<Task> taskList = new ArrayList<Task>();
+
+        // when
         when(this.taskRepository.findAll()).thenReturn(taskList);
         List<Task> actualAllTasks = this.taskServiceImpl.getAllTasks();
+
+        // then
         assertSame(taskList, actualAllTasks);
         assertTrue(actualAllTasks.isEmpty());
         verify(this.taskRepository).findAll();
@@ -81,27 +96,35 @@ public class TaskServiceImplTest {
 
     @Test
     public void testGetAllTasksByEmployeeId() {
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
+        // given
+        Company company = Company.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .employees(new ArrayList<Employee>())
+                .build();
 
-        Employee employee = new Employee();
-        employee.setEmail("jane.doe@example.org");
-        employee.setPassword("iloveyou");
-        employee.setId(123L);
-        employee.setName("Name");
-        employee.setCompany(company);
-        employee.setSurname("Doe");
+        Employee employee = Employee.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .surname("Doe")
+                .company(company)
+                .build();
+
         ArrayList<Task> taskList = new ArrayList<Task>();
         employee.setTasks(taskList);
+
+        // when
         when(this.employeeService.getEmployeeById(anyLong())).thenReturn(employee);
         List<Task> actualAllTasksByEmployeeId = this.taskServiceImpl.getAllTasksByEmployeeId(123L);
+
+        // then
         assertSame(taskList, actualAllTasksByEmployeeId);
         assertTrue(actualAllTasksByEmployeeId.isEmpty());
         verify(this.employeeService).getEmployeeById(anyLong());
@@ -110,28 +133,36 @@ public class TaskServiceImplTest {
 
     @Test
     public void testAddTask() {
-        Task task = new Task();
-        task.setEmployees(new ArrayList<Employee>());
-        task.setStatus(TaskStatusEnum.NEW);
-        task.setId(123L);
-        task.setTitle("Dr");
-        task.setCompanyId(123L);
-        task.setDescription("The characteristics of someone or something");
+        // given
         LocalDateTime atStartOfDayResult = LocalDate.of(1970, 1, 1).atStartOfDay();
-        task.setDeadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()));
+        Task task = Task.builder()
+                .id(123L)
+                .title("Dr")
+                .status(TaskStatusEnum.NEW)
+                .companyId(123L)
+                .description("The characteristics of someone or something")
+                .deadline(Date.from(atStartOfDayResult.atZone(ZoneId.systemDefault()).toInstant()))
+                .employees(new ArrayList<Employee>())
+                .build();
+
+        // when
         when(this.taskRepository.save((Task) any())).thenReturn(task);
         doNothing().when(this.emailUtil).notifyEmployeesByEmail(anyLong(), (List<Employee>) any());
 
-        Company company = new Company();
-        company.setEmployees(new ArrayList<Employee>());
-        company.setEmail("jane.doe@example.org");
-        company.setPassword("iloveyou");
-        company.setUsername("janedoe");
-        company.setId(123L);
-        company.setName("Name");
-        company.setPhoneNumber("4105551212");
-        company.setAddress("42 Main St");
+        Company company = Company.builder()
+                .id(123L)
+                .name("Name")
+                .email("jane.doe@example.org")
+                .password("iloveyou")
+                .username("janedoe")
+                .phoneNumber("4105551212")
+                .address("42 Main St")
+                .employees(new ArrayList<Employee>())
+                .build();
+
         when(this.companyService.getCompanyById(anyLong())).thenReturn(company);
+
+        // then
         assertSame(task, this.taskServiceImpl.addTask(123L, new AddTaskRequestDTO()));
         verify(this.taskRepository).save((Task) any());
         verify(this.emailUtil).notifyEmployeesByEmail(anyLong(), (List<Employee>) any());
